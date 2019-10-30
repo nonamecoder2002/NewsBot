@@ -54,5 +54,5 @@ def get_news(message):
         gap = gap + 3
 
 
-    gap = 0
+    gap = 3
 bot.polling(none_stop=True)

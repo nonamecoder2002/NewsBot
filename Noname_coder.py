@@ -3,7 +3,7 @@ import requests
 import re
 import telebot
 
-bot = telebot.TeleBot('')
+bot = telebot.TeleBot('925440483:AAHrvCoN89-Norr7LPjCs1xxflrs1oU604o')
 
 
 @bot.message_handler(commands=['news'])

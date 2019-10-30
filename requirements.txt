@@ -1,6 +1,5 @@
 requests
 bs4
-pyinstaller
 pytelegrambotapi
 telebot
 

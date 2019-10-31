@@ -7,7 +7,7 @@ bot = telebot.TeleBot('925440483:AAHrvCoN89-Norr7LPjCs1xxflrs1oU604o')
 
 
 # test
-
+gap = 3
 @bot.message_handler(commands=['news'])
 def get_news(message):
     global gap
@@ -29,10 +29,10 @@ def get_news(message):
             mes_time = get_time[x].getText()
             mes_title = get_title[x].getText()
             mes_title = str(mes_title)
-            mes_title = ''.join(re.findall('[А-Я]{1}\S+|\s\S+', mes_title))
+            mes_title = ''.join(re.findall('[А-Я]{1}\S+|\s\S+|[A-Z]{1}\S+|\s\S+', mes_title))
             mes_content = get_content[x].getText()
             storage.setdefault(count, '🕒 '+mes_time + '\n\n' + '📍' + mes_title + '📍' '\n\n📰 ' + mes_content + '\n\n '
-                               '🖥 ' + get_link)
+                               '🖥' + get_link)
         count += 1
 
     def output(y: int):

@@ -29,30 +29,30 @@ def get_news(message):
             mes_time = get_time[x].getText()
             mes_title = get_title[x].getText()
             mes_title = str(mes_title)
-            mes_title = ''.join(re.findall('[А-Я]{1}\S+|\s\S+|[A-Z]{1}\S+|\s\S+', mes_title))
+            mes_title = ''.join(re.findall('[А-Я]{1}\S+|[A-Z]{1}\S+|\s\S+', mes_title))
             mes_content = get_content[x].getText()
             storage.setdefault(count, '🕒 '+mes_time + '\n\n' + '📍' + mes_title + '📍' '\n\n📰 ' + mes_content + '\n\n '
-                               '🖥' + get_link)
+                               '🖥 ' + get_link)
         count += 1
 
-    def output(y: int):
+    def output(y, id_):
         i = 0
         for v in storage.values():
             if y <= i < y + 2:
-                bot.send_message(message.chat.id, v, disable_web_page_preview=True)
+                bot.send_message(id_, v, disable_web_page_preview=True)
             elif i == y + 2:
                 markup = telebot.types.InlineKeyboardMarkup()
                 expand_but = telebot.types.InlineKeyboardButton('Показати Ще', callback_data='expand')
                 markup.add(expand_but)
-                bot.send_message(message.chat.id, v, reply_markup=markup, disable_web_page_preview=True)
+                bot.send_message(id_, v, reply_markup=markup, disable_web_page_preview=True)
             i = i + 1
 
-    output(0)
+    output(0, message.chat.id)
 
     @bot.callback_query_handler(lambda query: query.data == 'expand')
     def expand(query):
         global gap
-        output(gap)
+        output(gap, query.message.chat.id)
         gap = gap + 3
 
     gap = 3

@@ -6,7 +6,6 @@ import telebot
 bot = telebot.TeleBot('925440483:AAHrvCoN89-Norr7LPjCs1xxflrs1oU604o')
 
 
-# test
 gap = 3
 @bot.message_handler(commands=['news'])
 def get_news(message):
@@ -15,8 +14,7 @@ def get_news(message):
     site = requests.get('https://www.pravda.com.ua/news/')
     site_script = bs4.BeautifulSoup(site.text, features="html.parser")
     tag_a = site_script.select('.news_all .article')
-    storage = {}
-    count = 0
+    storage = []
     for line in tag_a:
         get_time = line.select('.article__time')
         get_title = line.select('.article__title')
@@ -29,15 +27,13 @@ def get_news(message):
             mes_time = get_time[x].getText()
             mes_title = get_title[x].getText()
             mes_title = str(mes_title)
-            mes_title = ''.join(re.findall('[А-Я]{1}\S+|[A-Z]{1}\S+|\s\S+', mes_title))
+            mes_title = ''.join(re.findall(r'\S+|\s\S+', mes_title))
             mes_content = get_content[x].getText()
-            storage.setdefault(count, '🕒 '+mes_time + '\n\n' + '📍' + mes_title + '📍' '\n\n📰 ' + mes_content + '\n\n '
-                               '🖥 ' + get_link)
-        count += 1
+            storage.append(f'🕒 {mes_time}\n\n📍 {mes_title} 📍 \n\n📰 {mes_content}\n\n 🖥 {get_link}')
 
     def output(y, id_):
         i = 0
-        for v in storage.values():
+        for v in storage:
             if y <= i < y + 2:
                 bot.send_message(id_, v, disable_web_page_preview=True)
             elif i == y + 2:
@@ -54,8 +50,6 @@ def get_news(message):
         global gap
         output(gap, query.message.chat.id)
         gap = gap + 3
-
-    gap = 3
 
 
 bot.polling(none_stop=True)

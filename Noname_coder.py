@@ -5,12 +5,11 @@ import telebot
 
 bot = telebot.TeleBot('925440483:AAHrvCoN89-Norr7LPjCs1xxflrs1oU604o')
 
-
 gap = 3
+
+
 @bot.message_handler(commands=['news'])
 def get_news(message):
-    global gap
-    gap = 3
     site = requests.get('https://www.pravda.com.ua/news/')
     site_script = bs4.BeautifulSoup(site.text, features="html.parser")
     tag_a = site_script.select('.news_all .article')
@@ -31,9 +30,9 @@ def get_news(message):
             mes_content = get_content[x].getText()
             storage.append(f'🕒 {mes_time}\n\n📍 {mes_title} 📍 \n\n📰 {mes_content}\n\n 🖥 {get_link}')
 
-    def output(y, id_):
+    def output(y, id_, arr):
         i = 0
-        for v in storage:
+        for v in arr:
             if y <= i < y + 2:
                 bot.send_message(id_, v, disable_web_page_preview=True)
             elif i == y + 2:
@@ -43,13 +42,16 @@ def get_news(message):
                 bot.send_message(id_, v, reply_markup=markup, disable_web_page_preview=True)
             i = i + 1
 
-    output(0, message.chat.id)
+    output(0, message.chat.id, storage)
 
     @bot.callback_query_handler(lambda query: query.data == 'expand')
     def expand(query):
+        bot.edit_message_reply_markup(query.message.chat.id, query.message.message_id, reply_markup=None)
         global gap
-        output(gap, query.message.chat.id)
+        output(gap, query.message.chat.id, storage)
         gap = gap + 3
+    global gap
+    gap = 3
 
 
 bot.polling(none_stop=True)

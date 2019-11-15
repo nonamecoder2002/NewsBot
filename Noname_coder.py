@@ -1,6 +1,7 @@
 import bs4
 import telebot
 from urllib.request import urlopen
+
 bot = telebot.TeleBot('925440483:AAHrvCoN89-Norr7LPjCs1xxflrs1oU604o')
 
 gap = 3
@@ -33,14 +34,16 @@ def get_news(message):
             storage.append(f'🕒 {mes_time}\n\n📍 {mes_title}  \n\n📰 {mes_content}\n\n 🖥 {get_link}')
 
     def output(y, id_, arr):
-        for i in range(y, y+3):
-            if i != y+2:
+        for i in range(y, y + 3):
+            if i != y + 2:
                 bot.send_message(id_, arr[i], disable_web_page_preview=True)
             elif i == y + 2:
                 markup = telebot.types.InlineKeyboardMarkup()
                 expand_but = telebot.types.InlineKeyboardButton('Показати Ще', callback_data='expand')
-                markup.add(expand_but)
+                to_main_ = telebot.types.InlineKeyboardButton('Показати Найновіші', callback_data='to_main')
+                markup.add(expand_but, to_main_)
                 bot.send_message(id_, arr[i], reply_markup=markup, disable_web_page_preview=True)
+
     output(0, message.chat.id, storage)
 
     @bot.callback_query_handler(lambda query: query.data == 'expand')
@@ -51,6 +54,10 @@ def get_news(message):
         output(gap, query.message.chat.id, storage)
         gap = gap + 3
 
+    @bot.callback_query_handler(lambda query: query.data == 'to_main')
+    def to_main(query):
+        bot.edit_message_reply_markup(query.message.chat.id, query.message.message_id, reply_markup=None)
+        output(0,query.message.chat.id, storage)
     global gap
     gap = 3
 

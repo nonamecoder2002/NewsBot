@@ -10,28 +10,31 @@ storage = []
 
 @bot.message_handler(commands=['news'])
 def get_news(message):
-    site = urlopen('https://www.pravda.com.ua/news/')
-    site_script = bs4.BeautifulSoup(site, features="html.parser")
-    news_raw = site_script.find_all('div', {'class': 'news_all'})
-    global storage
-    storage = []
-    news_raw = news_raw[0]
-    get_time = news_raw.find_all('div', {'class': 'article__time'})
-    get_title = news_raw.find_all('div', {'class': 'article__title'})
-    get_content = news_raw.find_all('div', {'class': 'article__subtitle'})
-    for x in range(len(get_title)):
-        get_link = get_title[x].a.attrs['href']
-        if 'https:' not in get_link:
-            get_link = 'https://www.pravda.com.ua' + get_link
-        mes_time = get_time[x].getText()
-        mes_title = get_title[x].get_text()
-        mes_content = get_content[x].getText()
-        try:
-            junk = get_title[x].em.get_text()
-            mes_title = mes_title.replace(junk, '')
-            storage.append(f'🕒 {mes_time}\n\n📍 {mes_title}  \n\n📰 {mes_content}\n\n 🖥 {get_link}')
-        except AttributeError:
-            storage.append(f'🕒 {mes_time}\n\n📍 {mes_title}  \n\n📰 {mes_content}\n\n 🖥 {get_link}')
+    def get_cont():
+        site = urlopen('https://www.pravda.com.ua/news/')
+        site_script = bs4.BeautifulSoup(site, features="html.parser")
+        news_raw = site_script.find_all('div', {'class': 'news_all'})
+        global storage
+        storage = []
+        news_raw = news_raw[0]
+        get_time = news_raw.find_all('div', {'class': 'article__time'})
+        get_title = news_raw.find_all('div', {'class': 'article__title'})
+        get_content = news_raw.find_all('div', {'class': 'article__subtitle'})
+        for x in range(len(get_title)):
+            get_link = get_title[x].a.attrs['href']
+            if 'https:' not in get_link:
+                get_link = 'https://www.pravda.com.ua' + get_link
+            mes_time = get_time[x].getText()
+            mes_title = get_title[x].get_text()
+            mes_content = get_content[x].getText()
+            try:
+                junk = get_title[x].em.get_text()
+                mes_title = mes_title.replace(junk, '')
+                storage.append(f'🕒 {mes_time}\n\n📍 {mes_title}  \n\n📰 {mes_content}\n\n 🖥 {get_link}')
+            except AttributeError:
+                storage.append(f'🕒 {mes_time}\n\n📍 {mes_title}  \n\n📰 {mes_content}\n\n 🖥 {get_link}')
+
+    get_cont()
 
     def output(y, id_, arr):
         for i in range(y, y + 3):
@@ -56,10 +59,12 @@ def get_news(message):
 
     @bot.callback_query_handler(lambda query: query.data == 'to_main')
     def to_main(query):
+        global gap
+        global storage
         bot.edit_message_reply_markup(query.message.chat.id, query.message.message_id, reply_markup=None)
-        output(0,query.message.chat.id, storage)
-    global gap
-    gap = 3
+        get_cont()
+        output(0, query.message.chat.id, storage)
+        gap = 3
 
 
 bot.polling(none_stop=True)

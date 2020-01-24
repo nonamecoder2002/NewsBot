@@ -1,2 +1,0 @@
-# TelegtramBots
-# s	

@@ -43,7 +43,6 @@ def req_obj_to_bs4(url_):
 def error(update, context):
     print('Update "%s" caused error "%s"', update, context.error)
     logger.warning('Update "%s" caused error "%s"', update, context.error)
-    context.bot.send_message(text=f"{str(update)} ::::: {context.error}", chat_id=382182253)
 
 
 def log(update, context):

@@ -1,1 +1,1 @@
-worker: python Noname_coder.py $PORT
+worker: python main.py $PORT

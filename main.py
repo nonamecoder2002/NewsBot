@@ -24,7 +24,7 @@ def parse(bs4_obj):
     """
     article_raw = bs4_obj.a
     article_link = article_raw['href']
-    article_img_url = article_raw.img['data-src']
+    article_img_url = article_raw.img['src']
     article_desc = article_raw.img['alt']
     return [article_img_url, article_desc, article_link]
 
@@ -53,12 +53,21 @@ def log(update, context):
         update.message.reply_text("Файл пустой")
 
 
+def get_news(update, context):
+    html = req_obj_to_bs4('https://tsn.ua/ukrayina')
+    artic_raw_list = html.find_all('article', attrs={'class': ['h-entry', 'c-entry']})[0:3]
+    for article_raw in artic_raw_list:
+        article = parse(article_raw)
+        context.bot.send_photo(chat_id=update.message.chat.id, photo=article[0], caption=article[1]+'\n'+article[2])
+
+
 def main():
     updater = Updater('925440483:AAHrvCoN89-Norr7LPjCs1xxflrs1oU604o', use_context=True)
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler('start', start))
     dp.add_handler(CommandHandler('log', log, filters=Filters.user(user_id=(399835396, 382182253))))
+    dp.add_handler(CommandHandler('news', get_news))
     # ERROR
 
     dp.add_error_handler(error)

@@ -66,7 +66,7 @@ def get_news(update, context):
 
 def main():
     updater = Updater('925440483:AAHrvCoN89-Norr7LPjCs1xxflrs1oU604o', use_context=True)
-    dp = updater.dispatchergit 
+    dp = updater.dispatcher
 
     dp.add_handler(CommandHandler('start', start))
     dp.add_handler(CommandHandler('log', log, filters=Filters.user(user_id=(399835396, 382182253))))

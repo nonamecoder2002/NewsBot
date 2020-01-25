@@ -4,11 +4,12 @@ import requests
 from bs4 import BeautifulSoup
 import logging
 
-
 logging.basicConfig(handlers=[logging.FileHandler('log.txt', 'w', 'utf-8')],
                     level=logging.INFO,
                     format='[*] {%(pathname)s:%(lineno)d} %(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+html_global = None
 
 
 def start(update, context):
@@ -54,14 +55,27 @@ def log(update, context):
 
 
 def get_news(update, context):
-    html = req_obj_to_bs4('https://tsn.ua/ukrayina')
-    article_raw = html.article
-    i = 0
-    while i < 4:
-        article = parse(article_raw)
-        context.bot.send_photo(chat_id=update.message.chat.id, photo=article[0], caption=article[1]+'\n'+article[2])
-        article_raw = article_raw.find_next('article')
-        i += 1
+    global html_global
+    html_global = req_obj_to_bs4('https://tsn.ua/ukrayina')
+    article_raw = html_global.article
+    keyboard = [
+        [InlineKeyboardButton('Down', callback_data='down')]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    article = parse(article_raw)
+    context.bot.send_photo(chat_id=update.message.chat.id, photo=article[0], caption=article[1] + '\n' + article[2],
+                           reply_markup=reply_markup)
+    html_global = str(html_global).replace(str(article_raw), '')
+
+
+def list_down(update, context):
+    bot = context.bot
+    query = update.callback_query
+    global html_global
+    article = BeautifulSoup(html_global, 'html.parser').article
+    # bot.send_message(text='Callback works', chat_id =query.message.chat.id)
+    html_global = str(html_global).replace(str(article), '')
+    print(article)
 
 
 def main():
@@ -71,6 +85,7 @@ def main():
     dp.add_handler(CommandHandler('start', start))
     dp.add_handler(CommandHandler('log', log, filters=Filters.user(user_id=(399835396, 382182253))))
     dp.add_handler(CommandHandler('news', get_news))
+    dp.add_handler(CallbackQueryHandler(callback=list_down, pattern='^down$'))
     # ERROR
 
     dp.add_error_handler(error)

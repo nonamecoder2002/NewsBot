@@ -55,10 +55,13 @@ def log(update, context):
 
 def get_news(update, context):
     html = req_obj_to_bs4('https://tsn.ua/ukrayina')
-    artic_raw_list = html.find_all('article', attrs={'class': ['h-entry', 'c-entry']})[0:3]
-    for article_raw in artic_raw_list:
+    article_raw = html.article
+    i = 0
+    while i < 4:
         article = parse(article_raw)
         context.bot.send_photo(chat_id=update.message.chat.id, photo=article[0], caption=article[1]+'\n'+article[2])
+        article_raw = article_raw.find_next('article')
+        i += 1
 
 
 def main():

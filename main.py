@@ -71,11 +71,18 @@ def get_news(update, context):
 def list_down(update, context):
     bot = context.bot
     query = update.callback_query
+    keyboard = [
+        [InlineKeyboardButton('Down', callback_data='down')]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    bot.edit_message_caption(chat_id=query.message.chat_id, message_id=query.message.message_id,
+                             caption=query.message.caption)
     global html_global
     article = BeautifulSoup(html_global, 'html.parser').article
-    # bot.send_message(text='Callback works', chat_id =query.message.chat.id)
     html_global = str(html_global).replace(str(article), '')
-    print(article)
+    article = parse(article)
+    bot.send_photo(chat_id=query.message.chat.id, photo=article[0], caption=article[1] + '\n' + article[2],
+                   reply_markup=reply_markup)
 
 
 def main():

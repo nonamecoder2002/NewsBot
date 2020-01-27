@@ -83,6 +83,7 @@ def list_down(update, context):
     article = parse(article)
     bot.send_photo(chat_id=query.message.chat.id, photo=article[0], caption=article[1] + '\n' + article[2],
                    reply_markup=reply_markup)
+    
 
 
 def main():

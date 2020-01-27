@@ -63,9 +63,9 @@ def get_news(update, context):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     article = parse(article_raw)
-    caption_ = '*'+article[1]+'* \n' + '[Посилання Тут]('+article[2]+')'
+    caption_ = '*'+article[1]+'* \n' + '[Посилання Тут](' + article[2] + ')'
     context.bot.send_photo(chat_id=update.message.chat.id, photo=article[0], caption=caption_,
-                           reply_markup=reply_markup, parse_mode='MARKDOWN')
+                           reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN)
     html_global = str(html_global).replace(str(article_raw), '')
 
 
@@ -77,15 +77,14 @@ def list_down(update, context):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     bot.edit_message_caption(chat_id=query.message.chat_id, message_id=query.message.message_id,
-                             parse_mode='MARKDOWN', caption=query.message.caption)
-    print(query.message.caption)
+                             parse_mode=ParseMode.MARKDOWN, caption=query.message.caption)
     global html_global
     article = BeautifulSoup(html_global, 'html.parser').article
     html_global = str(html_global).replace(str(article), '')
     article = parse(article)
-    caption_ = '*' + article[1] + '* \n' + '[inline URL](' + article[2] + ')'
+    caption_ = '*' + article[1] + '* \n' + '[Посилання Тут](' + article[2] + ')'
     bot.send_photo(chat_id=query.message.chat.id, photo=article[0], caption=caption_,
-                   reply_markup=reply_markup, parse_mode='MARKDOWN')
+                   reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN)
 
 
 def main():

@@ -58,12 +58,13 @@ def get_news(update, context):
     global html_global
     html_global = req_obj_to_bs4('https://tsn.ua/ukrayina')
     article_raw = html_global.article
+    article = parse(article_raw)
     keyboard = [
+        [InlineKeyboardButton(text='Посидання Тут', url=article[2]), ],
         [InlineKeyboardButton('Down', callback_data='down')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    article = parse(article_raw)
-    caption_ = '*'+article[1]+'* \n' + '[Посилання Тут](' + article[2] + ')'
+    caption_ = '*'+article[1]+'*'
     context.bot.send_photo(chat_id=update.message.chat.id, photo=article[0], caption=caption_,
                            reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN)
     html_global = str(html_global).replace(str(article_raw), '')
@@ -72,17 +73,19 @@ def get_news(update, context):
 def list_down(update, context):
     bot = context.bot
     query = update.callback_query
-    keyboard = [
-        [InlineKeyboardButton('Down', callback_data='down')]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    bot.edit_message_caption(chat_id=query.message.chat_id, message_id=query.message.message_id,
-                             parse_mode=ParseMode.MARKDOWN, caption=query.message.caption)
     global html_global
     article = BeautifulSoup(html_global, 'html.parser').article
     html_global = str(html_global).replace(str(article), '')
     article = parse(article)
-    caption_ = '*' + article[1] + '* \n' + '[Посилання Тут](' + article[2] + ')'
+    url_keyboard = InlineKeyboardMarkup([query.message.reply_markup.inline_keyboard[0]])
+    bot.edit_message_caption(chat_id=query.message.chat_id, message_id=query.message.message_id,
+                             parse_mode=ParseMode.MARKDOWN, caption=query.message.caption, reply_markup=url_keyboard)
+    keyboard = [
+        [InlineKeyboardButton(text='Посидання Тут', url=article[2])],
+        [InlineKeyboardButton('Down', callback_data='down')]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    caption_ = '*' + article[1] + '*'
     bot.send_photo(chat_id=query.message.chat.id, photo=article[0], caption=caption_,
                    reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN)
 

@@ -11,6 +11,9 @@ logger = logging.getLogger(__name__)
 
 html_global = None
 
+# FIXME:
+#  1. Fix len() error
+
 
 def start(update, context):
     context.bot.send_message(text="Я бот", chat_id=update.message.chat_id)
@@ -53,7 +56,7 @@ def get_news(update, context):
         [InlineKeyboardButton('Далі ⬇️', callback_data='down')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    caption_ = '*'+article[1]+'*'
+    caption_ = '*' + article[1] + '*'
     context.bot.send_photo(chat_id=update.message.chat.id, photo=article[0], caption=caption_,
                            reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN)
     html_global = str(html_global).replace(str(article_raw), '')

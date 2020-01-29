@@ -50,7 +50,7 @@ def get_news(update, context):
     article = parse(article_raw)
     keyboard = [
         [InlineKeyboardButton(text='Посидання Тут', url=article[2]), ],
-        [InlineKeyboardButton('Down', callback_data='down')]
+        [InlineKeyboardButton('Далі ➡️', callback_data='down')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     caption_ = '*'+article[1]+'*'
@@ -71,7 +71,7 @@ def list_down(update, context):
                              parse_mode=ParseMode.MARKDOWN, caption=query.message.caption, reply_markup=url_keyboard)
     keyboard = [
         [InlineKeyboardButton(text='Посидання Тут', url=article[2])],
-        [InlineKeyboardButton('Down', callback_data='down')]
+        [InlineKeyboardButton('Далі  ➡️', callback_data='down')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     caption_ = '*' + article[1] + '*'

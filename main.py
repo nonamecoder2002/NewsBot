@@ -67,7 +67,7 @@ def list_down(update, context):
     query = update.callback_query
     global html_global
     article = html_global.article
-    html_global = BeautifulSoup(str(html_global).replace(str(article_raw), ''), 'html.parser')
+    html_global = BeautifulSoup(str(html_global).replace(str(article), ''), 'html.parser')
     article = parse(article)
     url_keyboard = InlineKeyboardMarkup([query.message.reply_markup.inline_keyboard[0]])
     bot.edit_message_caption(chat_id=query.message.chat_id, message_id=query.message.message_id,

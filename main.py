@@ -59,14 +59,14 @@ def get_news(update, context):
     caption_ = '*' + article[1] + '*'
     context.bot.send_photo(chat_id=update.message.chat.id, photo=article[0], caption=caption_,
                            reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN)
-    html_global = str(html_global).replace(str(article_raw), '')
+    html_global = BeautifulSoup(str(html_global).replace(str(article_raw), ''), 'html.parser')
 
 
 def list_down(update, context):
     bot = context.bot
     query = update.callback_query
     global html_global
-    article = BeautifulSoup(html_global, 'html.parser').article
+    article = html_global.article
     html_global = str(html_global).replace(str(article), '')
     article = parse(article)
     url_keyboard = InlineKeyboardMarkup([query.message.reply_markup.inline_keyboard[0]])

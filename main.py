@@ -72,10 +72,13 @@ def list_down(update, context):
     global session_string
     query = update.callback_query
 
+    if len(session_string[query.from_user.id]) == 0:
+        query.message.reply_text("Список новин закінчився.\nОновити список: /news")
+        return
+
     url = session_string[query.from_user.id][0]['url']
     description = session_string[query.from_user.id][0]['description']
     img_url = session_string[query.from_user.id][0]['img_url']
-    print(session_string[query.from_user.id])
 
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton(text='Посилання Тут', url=url)],

@@ -57,7 +57,6 @@ def load_news():
         if img_url is None or description is None:
             continue
 
-        print(f"| {url}\n|\n| {img_url}\n|\n| {description}\n\n\n")
         """
 
     return article_container

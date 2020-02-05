@@ -27,42 +27,16 @@ def load_news():
     for article in site_html.find_all(name='article'):
         try:
             article_dict = dict(zip(['article_img', 'article_title', 'article_url'],
-                                [article.a.img['src'], article.a.img['alt'], article.a['href']]))
+                                [article.a.img['src'] if 'http' in article.a.img['src'] else article.a.img['data-src'],
+                                 article.a.img['alt'], article.a['href']]))
             article_container.append(article_dict)
         except TypeError:
             break
-        """    
-        url = article.div.a['href']
-        img_url = None
-        description = None
-
-        for img in article.find_all('img'):
-            try:
-                if img['class'][0] == 'c-post-img':
-                    img_url = img['src']
-                    description = img['alt']
-                    break
-
-                elif img['class'][0] == 'lazyload c-post-img' or \
-                        img['class'][0] == 'lazyload':
-                    img_url = img['data-src']
-                    description = img['alt']
-                    break
-            except Exception as err:
-                if err == 'class':
-                    img_url = img['src']
-                    description = img['alt']
-                    break
-
-        if img_url is None or description is None:
-            continue
-
-        """
-
+        print(article_dict)
     return article_container
 
 
-print(load_news())
+load_news()
 
 
 def show_news(update, context):

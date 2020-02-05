@@ -25,9 +25,12 @@ def load_news():
     article_container = []
     site_html = BeautifulSoup(requests.get(url='https://tsn.ua/ukrayina').content, 'lxml')
     for article in site_html.find_all(name='article'):
-        article_dict = dict(zip(['article_img', 'article_title', 'article_url'],
-                            [article.img, article.img['height'], article.a['href']]))
-        article_container.append(article_dict)
+        try:
+            article_dict = dict(zip(['article_img', 'article_title', 'article_url'],
+                                [article.a.img['src'], article.a.img['alt'], article.a['href']]))
+            article_container.append(article_dict)
+        except TypeError:
+            break
         """    
         url = article.div.a['href']
         img_url = None
@@ -58,6 +61,9 @@ def load_news():
         """
 
     return article_container
+
+
+print(load_news())
 
 
 def show_news(update, context):

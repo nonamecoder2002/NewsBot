@@ -31,9 +31,6 @@ def load_news():
     return article_container
 
 
-print(load_news()[-1])
-
-
 def show_news(update, context):
     context.bot.send_photo(chat_id=update.message.chat.id, photo='', caption='',
                            reply_markup=keyboard, parse_mode=ParseMode.HTML)

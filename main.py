@@ -23,11 +23,40 @@ def start(update, context):
 
 def load_news():
     article_container = []
-    site_html = BeautifulSoup(requests.get(url='https://tsn.ua/ukrayina').content, 'html.parser')
-    for article in site_html.find_all(name='article'):
+    site_html = BeautifulSoup(requests.get(url='https://tsn.ua/ukrayina').text, 'lxml')
+    for article in site_html.find_all('article'):
         article_dict = dict(zip(['article_img', 'article_title', 'article_url'],
                             [article.img['data-src'], article.img['alt'], article.a['href']]))
         article_container.append(article_dict)
+
+        """    
+        url = article.div.a['href']
+        img_url = None
+        description = None
+
+        for img in article.find_all('img'):
+            try:
+                if img['class'][0] == 'c-post-img':
+                    img_url = img['src']
+                    description = img['alt']
+                    break
+
+                elif img['class'][0] == 'lazyload c-post-img' or \
+                        img['class'][0] == 'lazyload':
+                    img_url = img['data-src']
+                    description = img['alt']
+                    break
+            except Exception as err:
+                if err == 'class':
+                    img_url = img['src']
+                    description = img['alt']
+                    break
+
+        if img_url is None or description is None:
+            continue
+
+        print(f"| {url}\n|\n| {img_url}\n|\n| {description}\n\n\n")
+        """
     return article_container
 
 

@@ -13,6 +13,7 @@ session_string = {}  # {user_id: [articles]}
 
 
 def start(update, context):
+
     context.bot.send_message(text="Я бот", chat_id=update.message.chat_id)
 
 

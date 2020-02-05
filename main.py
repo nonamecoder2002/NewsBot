@@ -23,10 +23,10 @@ def start(update, context):
 
 def load_news():
     article_container = []
-    site_html = BeautifulSoup(requests.get(url='https://tsn.ua/ukrayina').content, 'html.parser')
+    site_html = BeautifulSoup(requests.get(url='https://tsn.ua/ukrayina').content, 'lxml')
     for article in site_html.find_all(name='article'):
         article_dict = dict(zip(['article_img', 'article_title', 'article_url'],
-                            [article.img['data-src'], article.img['alt'], article.a['href']]))
+                            [article.img, article.img['height'], article.a['href']]))
         article_container.append(article_dict)
     return article_container
 

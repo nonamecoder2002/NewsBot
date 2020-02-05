@@ -9,21 +9,29 @@ logging.basicConfig(handlers=[logging.FileHandler('log.txt', 'w', 'utf-8')],
                     format='[*] {%(pathname)s:%(lineno)d} %(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-news_container = ()
+news_container = []
 
 keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton(text='Посилання Тут', url='')],
-        [InlineKeyboardButton('Далі ⬇️', callback_data='down')]
-    ])
+    [InlineKeyboardButton(text='Посилання Тут', url='')],
+    [InlineKeyboardButton('Далі ⬇️', callback_data='down')]
+])
 
 
 def start(update, context):
-
     context.bot.send_message(text="Найновіші новини тут!", chat_id=update.message.chat_id)
 
 
 def load_news():
-    pass
+    article_container = []
+    site_html = BeautifulSoup(requests.get(url='https://tsn.ua/ukrayina').content, 'html.parser')
+    for article in site_html.find_all(name='article'):
+        article_dict = dict(zip(['article_img', 'article_title', 'article_url'],
+                            [article.img['data-src'], article.img['alt'], article.a['href']]))
+        article_container.append(article_dict)
+    return article_container
+
+
+print(load_news()[-1])
 
 
 def show_news(update, context):

@@ -9,35 +9,37 @@ logging.basicConfig(handlers=[logging.FileHandler('log.txt', 'w', 'utf-8')],
                     format='[*] {%(pathname)s:%(lineno)d} %(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+news_container = ()
+
+keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton(text='Посилання Тут', url='')],
+        [InlineKeyboardButton('Далі ⬇️', callback_data='down')]
+    ])
+
 
 def start(update, context):
 
     context.bot.send_message(text="Найновіші новини тут!", chat_id=update.message.chat_id)
 
 
-def get_news(update, context):
+def load_news():
+    pass
 
-    keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton(text='Посилання Тут', url='')],
-        [InlineKeyboardButton('Далі ⬇️', callback_data='down')]
-    ])
+
+def show_news(update, context):
     context.bot.send_photo(chat_id=update.message.chat.id, photo='', caption='',
                            reply_markup=keyboard, parse_mode=ParseMode.HTML)
 
 
-def list_down(update, context):
+def show_next(update, context):
     query = update.callback_query
-    keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton(text='Посилання Тут', url='')],
-        [InlineKeyboardButton('Далі ⬇️', callback_data='down')]
-    ])
-    context.bot.send_photo(chat_id='', photo='', caption='',
-                           reply_markup=keyboard, parse_mode=ParseMode.HTML, timeout='')
+    context.bot.send_photo(chat_id='', photo='___url_for_photo___', caption='___text___',
+                           reply_markup=keyboard, parse_mode=ParseMode.HTML, timeout='__int_val__')
 
     url_keyboard = InlineKeyboardMarkup([query.message.reply_markup.inline_keyboard[0]])
     context.bot.edit_message_caption(chat_id=query.message.chat_id, message_id=query.message.message_id,
                                      parse_mode=ParseMode.HTML, caption=query.message.caption,
-                                     reply_markup=url_keyboard, timeout=10)
+                                     reply_markup=url_keyboard, timeout='__int_val__')
 
 
 def error(update, context):
@@ -59,8 +61,8 @@ def main():
 
     dp.add_handler(CommandHandler('start', start))
     dp.add_handler(CommandHandler('log', log, filters=Filters.user(user_id=(399835396, 382182253))))
-    dp.add_handler(CommandHandler('news', get_news))
-    dp.add_handler(CallbackQueryHandler(callback=list_down, pattern='^down$'))
+    dp.add_handler(CommandHandler('news', show_news))
+    dp.add_handler(CallbackQueryHandler(callback=show_next, pattern='^down$'))
     # ERROR
 
     dp.add_error_handler(error)

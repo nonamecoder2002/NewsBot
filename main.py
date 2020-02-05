@@ -26,12 +26,12 @@ def load_news():
     site_html = BeautifulSoup(requests.get(url='https://tsn.ua/ukrayina').content, 'lxml')
     for article in site_html.find_all(name='article'):
         article_dict = dict(zip(['article_img', 'article_title', 'article_url'],
-                            [article.a.img['alt'], article.a.img, article.a]))
+                            [article.img, article.img['height'], article.a['href']]))
         article_container.append(article_dict)
     return article_container
 
 
-print(load_news())
+print(load_news()[-1])
 
 
 def show_news(update, context):

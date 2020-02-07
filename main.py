@@ -43,9 +43,9 @@ def load_news():
 def show_news(update, context):
     global news_container
     news_container = load_news()
-    caption_text = '🕔 ' + news_container[0]['article_post_time'] + '  \t\t👁‍🗨' + news_container[0]['article_views'] + '\n\n' \
-                   + news_container[0]['article_title']+'\n\n' + news_container[0]['article_url']
-    context.bot.send_photo(chat_id=update.message.chat.id, photo=news_container[0]['article_img'], caption= caption_text,
+    caption_text = '🕔 <b>' + news_container[0]['article_post_time'] + '  \t\t👁‍🗨' + news_container[0]['article_views'] \
+                   + '\n\n' + news_container[0]['article_title'] + '</b>\n\n' + news_container[0]['article_url']
+    context.bot.send_photo(chat_id=update.message.chat.id, photo=news_container[0]['article_img'], caption=caption_text,
                            reply_markup=None, parse_mode=ParseMode.HTML)
 
 

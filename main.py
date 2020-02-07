@@ -14,7 +14,6 @@ logger = logging.getLogger(__name__)
 news_container = []
 
 keyboard = InlineKeyboardMarkup([
-    [InlineKeyboardButton(text='Посилання Тут', url='')],
     [InlineKeyboardButton('Далі ⬇️', callback_data='down')]
 ])
 
@@ -43,21 +42,28 @@ def load_news():
 def show_news(update, context):
     global news_container
     news_container = load_news()
-    caption_text = '🕔 <b>' + news_container[0]['article_post_time'] + '  \t\t👁‍🗨' + news_container[0]['article_views'] \
-                   + '\n\n' + news_container[0]['article_title'] + '</b>\n\n' + news_container[0]['article_url']
+    caption_text = '🕔 *' + news_container[0]['article_post_time']+'  \t\t👁‍🗨'+news_container[0]['article_views'] \
+                   +'\n\n'+news_container[0]['article_title']+'*\n\n[Посилання]('+news_container[0]['article_url']+')'
     context.bot.send_photo(chat_id=update.message.chat.id, photo=news_container[0]['article_img'], caption=caption_text,
-                           reply_markup=None, parse_mode=ParseMode.HTML)
+                           reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
+    news_container.pop(0)
 
 
 def show_next(update, context):
+    global news_container
     query = update.callback_query
-    context.bot.send_photo(chat_id='', photo='___url_for_photo___', caption='___text___',
-                           reply_markup=keyboard, parse_mode=ParseMode.HTML, timeout='__int_val__')
-
-    url_keyboard = InlineKeyboardMarkup([query.message.reply_markup.inline_keyboard[0]])
+    caption_edited = query.message.caption.replace('Посилання',
+                                                   '[Посилання](' + query.message.caption_entities[1].url + ')')
     context.bot.edit_message_caption(chat_id=query.message.chat_id, message_id=query.message.message_id,
-                                     parse_mode=ParseMode.HTML, caption=query.message.caption,
-                                     reply_markup=url_keyboard, timeout='__int_val__')
+                                     parse_mode=ParseMode.MARKDOWN, caption=caption_edited,
+                                     reply_markup=None, timeout=10)
+    caption_text = '🕔 *' + news_container[0]['article_post_time'] + '  \t\t👁‍🗨' + news_container[0]['article_views'] \
+                   + '\n\n' + news_container[0]['article_title'] + '*\n\n[Посилання](' + news_container[0][
+                       'article_url'] + ')'
+    context.bot.send_photo(chat_id=query.message.chat.id, photo=news_container[0]['article_img'],
+                           caption=caption_text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN, timeout=10)
+
+    news_container.pop(0)
 
 
 def error(update, context):

@@ -1,4 +1,4 @@
-dateutil
+python-dateutil
 requests
 beautifulsoup4
 python-telegram-bot

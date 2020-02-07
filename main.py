@@ -3,6 +3,8 @@ from telegram.ext import *
 import requests
 from bs4 import BeautifulSoup
 import logging
+from dateutil import parser
+import re
 
 logging.basicConfig(handlers=[logging.FileHandler('log.txt', 'w', 'utf-8')],
                     level=logging.INFO,
@@ -26,22 +28,25 @@ def load_news():
     site_html = BeautifulSoup(requests.get(url='https://tsn.ua/ukrayina').content, 'lxml')
     for article in site_html.find_all(name='article'):
         try:
-            article_dict = dict(zip(['article_img', 'article_title', 'article_url'],
-                                [article.a.img['src'] if 'http' in article.a.img['src'] else article.a.img['data-src'],
-                                 article.a.img['alt'], article.a['href']]))
+            time = parser.parse(timestr=article.time['datetime']).strftime('%H:%M %d-%m')
+            views = ''.join(re.findall(pattern=r'\d', string=article.find_all('li')[1].getText()))
+            article_dict = dict(
+                zip(['article_img', 'article_title', 'article_url', 'article_post_time', 'article_views'],
+                    [article.a.img['src'] if 'http' in article.a.img['src'] else article.a.img['data-src'],
+                     article.a.img['alt'], article.a['href'], time, views]))
             article_container.append(article_dict)
         except TypeError:
             break
-        print(article_dict)
     return article_container
 
 
-load_news()
-
-
 def show_news(update, context):
-    context.bot.send_photo(chat_id=update.message.chat.id, photo='', caption='',
-                           reply_markup=keyboard, parse_mode=ParseMode.HTML)
+    global news_container
+    news_container = load_news()
+    caption_text = news_container[0]['article_post_time'] + '  ' + news_container[0]['article_views'] + '\n\n' \
+                   + news_container[0]['article_title']+'\n\n' + news_container[0]['article_url']
+    context.bot.send_photo(chat_id=update.message.chat.id, photo=news_container[0]['article_img'], caption= caption_text,
+                           reply_markup=None, parse_mode=ParseMode.HTML)
 
 
 def show_next(update, context):

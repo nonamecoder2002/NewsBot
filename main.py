@@ -1,10 +1,12 @@
 from telegram import *
 from telegram.ext import *
+from telegram.error import TimedOut
 import requests
 from bs4 import BeautifulSoup
 import logging
 from dateutil import parser
 import re
+
 # refactor completed
 logging.basicConfig(handlers=[logging.FileHandler('log.txt', 'w', 'utf-8')],
                     level=logging.INFO,
@@ -22,7 +24,7 @@ def start(update, context):
     context.bot.send_message(text="Найновіші новини тут!", chat_id=update.message.chat_id)
 
 
-def load_news():
+def load_news(update):
     article_container = []
     site_html = BeautifulSoup(requests.get(url='https://tsn.ua/ukrayina').content, 'lxml')
     for article in site_html.find_all(name='article'):
@@ -36,14 +38,15 @@ def load_news():
             article_container.append(article_dict)
         except TypeError:
             break
-    return article_container
+    return {update.message.from_user.id: article_container}
 
 
 def show_news(update, context):
     global news_container
-    news_container = load_news()
-    caption_text = '🕔 *' + news_container[0]['article_post_time']+'  \t\t👁‍🗨'+news_container[0]['article_views'] \
-                   +'\n\n'+news_container[0]['article_title']+'*\n\n[Посилання]('+news_container[0]['article_url']+')'
+    news_container = load_news(update)[update.message.from_user.id]
+    caption_text = '🕔 *' + news_container[0]['article_post_time'] + '  \t\t👁‍🗨' + news_container[0]['article_views'] \
+                   + '\n\n' + news_container[0]['article_title'] + '*\n\n[Посилання](' + news_container[0][
+                       'article_url'] + ')'
     context.bot.send_photo(chat_id=update.message.chat.id, photo=news_container[0]['article_img'], caption=caption_text,
                            reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
     news_container.pop(0)
@@ -52,17 +55,19 @@ def show_news(update, context):
 def show_next(update, context):
     global news_container
     query = update.callback_query
-    caption_edited = query.message.caption.replace('Посилання',
-                                                   '[Посилання](' + query.message.caption_entities[1].url + ')')
-    context.bot.edit_message_caption(chat_id=query.message.chat_id, message_id=query.message.message_id,
-                                     parse_mode=ParseMode.MARKDOWN, caption=caption_edited,
-                                     reply_markup=None, timeout=10)
-    caption_text = '🕔 *' + news_container[0]['article_post_time'] + '  \t\t👁‍🗨' + news_container[0]['article_views'] \
-                   + '\n\n' + news_container[0]['article_title'] + '*\n\n[Посилання](' + news_container[0][
-                       'article_url'] + ')'
-    context.bot.send_photo(chat_id=query.message.chat.id, photo=news_container[0]['article_img'],
-                           caption=caption_text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN, timeout=10)
-
+    try:
+        caption_edited = query.message.caption.replace('Посилання',
+                                                       '[Посилання](' + query.message.caption_entities[1].url + ')')
+        context.bot.edit_message_caption(chat_id=query.message.chat_id, message_id=query.message.message_id,
+                                         parse_mode=ParseMode.MARKDOWN, caption=caption_edited,
+                                         reply_markup=None, timeout=10)
+        caption_text = '🕔 *' + news_container[0]['article_post_time'] + '  \t\t👁‍🗨' + news_container[0]['article_views'] \
+                       + '\n\n' + news_container[0]['article_title'] + '*\n\n[Посилання](' + news_container[0][
+                           'article_url'] + ')'
+        context.bot.send_photo(chat_id=query.message.chat.id, photo=news_container[0]['article_img'],
+                               caption=caption_text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN, timeout=10)
+    except TimedOut:
+        context.bot.send_message(text='Завантаження...', chat_id=query.message.chat.id)
     news_container.pop(0)
 
 

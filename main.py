@@ -12,7 +12,7 @@ logging.basicConfig(handlers=[logging.FileHandler('log.txt', 'w', 'utf-8')],
                     format='[*] {%(pathname)s:%(lineno)d} %(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-news_container = []
+session_container = {}
 
 keyboard = InlineKeyboardMarkup([
     [InlineKeyboardButton('Далі ⬇️', callback_data='down')]
@@ -24,6 +24,7 @@ def start(update, context):
 
 
 def load_news(update):
+    global session_container
     article_container = []
     site_html = BeautifulSoup(requests.get(url='https://tsn.ua/ukrayina').content, 'lxml')
     for article in site_html.find_all(name='article'):
@@ -37,12 +38,13 @@ def load_news(update):
             article_container.append(article_dict)
         except TypeError:
             break
-    return {update.message.from_user.id: article_container}
+    session_container.update({update.message.from_user.id: article_container})
 
 
 def show_news(update, context):
-    global news_container
-    news_container = load_news(update)[update.message.from_user.id]
+    global session_container
+    load_news(update)
+    news_container = session_container[update.message.from_user.id]
     caption_text = '🕔 *' + news_container[0]['article_post_time'] + '  \t\t👁‍🗨' + news_container[0]['article_views'] \
                    + '\n\n' + news_container[0]['article_title'] + '*\n\n[Посилання](' + news_container[0][
                        'article_url'] + ')'
@@ -52,8 +54,9 @@ def show_news(update, context):
 
 
 def show_next(update, context):
-    global news_container
+    global session_container
     query = update.callback_query
+    news_container = session_container[query.from_user.id]
     try:
         caption_edited = query.message.caption.replace('Посилання',
                                                        '[Посилання](' + query.message.caption_entities[1].url + ')')

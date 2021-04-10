@@ -87,11 +87,11 @@ def log(update, context):
 
 
 def main():
-    updater = Updater('925440483:AAHrvCoN89-Norr7LPjCs1xxflrs1oU604o', use_context=True)
+    updater = Updater('BOT_TOKEN', use_context=True)
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler('start', start))
-    dp.add_handler(CommandHandler('log', log, filters=Filters.user(user_id=(399835396, 382182253))))
+    dp.add_handler(CommandHandler('log', log, filters=Filters.user(user_id=(USER_ID, USER_ID))))
     dp.add_handler(CommandHandler('news', show_news))
     dp.add_handler(CallbackQueryHandler(callback=show_next, pattern='^down$'))
     # ERROR
